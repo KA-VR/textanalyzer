@@ -1,0 +1,11 @@
+# Config file 
+config.js
+
+# Ignore Log Files
+npm-debug.log
+
+# Ignore Dev Folder
+dev
+
+# Ignore Node Modules
+node_modules
