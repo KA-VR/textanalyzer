@@ -4,21 +4,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev-server:build": "babel src/server -d dev/server",
     "watch-server": "babel --watch src/server -d dev/server",
     "start": "npm run watch-server & nodemon dev/server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint * --quiet",
-    "build:seed": "babel src/server/database/src -d src/server/database/build",
-    "seed": "npm run build:seed && node src/server/database/build/seed.js"
+    "seed": "npm run dev-server:build && node dev/server/database/seed.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.0.0-rc.6",
+    "bluebird": "^3.4.1",
+    "body-parser": "^1.15.2",
+    "cheerio": "^0.20.0",
     "es6-promise": "^3.2.1",
     "express": "^4.14.0",
     "isomorphic-fetch": "^2.2.1",
-    "redis": "^2.6.2"
+    "redis": "^2.6.2",
+    "request": "^2.72.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",

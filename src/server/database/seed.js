@@ -1,21 +1,20 @@
+/* eslint-disable no-console */
 import redis from 'redis';
 
-const client = require('redis').createClient();
-
+const client = redis.createClient();
 const data = [
-  'the', 'to'
+  'the', 'to', 'a',
 ];
-
 
 const populateRedis = () => {
   data.forEach(word => {
     client.sadd(['residue', word], (err, reply) => {
-    	if(err){
-    		console.log('Error adding in ', word, ': ', err);
-    	}
+      if (err) {
+        console.log('Error adding in ', word, ': ', err);
+      }
       console.log('Successful addition of word:', word);
     });
   });
-}
+};
 
 populateRedis();
