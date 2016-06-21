@@ -7,7 +7,9 @@
     "watch-server": "babel --watch src/server -d dev/server",
     "start": "npm run watch-server & nodemon dev/server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint * --quiet"
+    "lint": "eslint * --quiet",
+    "build:seed": "babel src/server/database/src -d src/server/database/build",
+    "seed": "npm run build:seed && node src/server/database/build/seed.js"
   },
   "keywords": [],
   "author": "",

@@ -1,5 +1,6 @@
 import redis from 'redis';
-import { client } from './redis.js';
+
+const client = require('redis').createClient();
 
 const data = [
   'the', 'to'
