@@ -1,6 +1,5 @@
 import async from 'async';
 import VocabFetcher from '../helpers/wordFetcher';
-// import VocabFetcher from 'vocab-fetcher';
 import redis from '../database/redis';
 
 
@@ -17,10 +16,13 @@ const analyzeString = (text, filterWords, callback) => {
   const filtered = words.filter(word => filterWords.indexOf(word) === -1);
   const object = [];
   let verb = null;
+  let synonyms = [];
 
   async.eachSeries(filtered, (word, cb) => {
     getDefinition(word, definitions => {
-      // if (definitions) {
+      definitions.forEach(def => {
+        if (def.synonyms && def.partOfSpeech === 'v') synonyms = synonyms.concat(def.synonyms);
+      });
       for (let i = 0; i < definitions.length; i++) {
         const partOfSpeech = definitions[i].partOfSpeech;
         if (partOfSpeech === 'v' && !verb) {
@@ -31,13 +33,12 @@ const analyzeString = (text, filterWords, callback) => {
           i = definitions.length;
         }
       }
-      // }
       cb();
     });
   }, err => {
     // eslint-disable-next-line no-console
     console.log(err);
-    callback({ verb, object });
+    callback({ text, verb, object, synonyms });
   });
 };
 

@@ -40,32 +40,53 @@ function convertVocabDotComDomToJSON(body, callback) {
     // definitions
     const definitions = [];
     // If page has "Primary Meaning" definitions, we should use
-    //   these and not the general defintiions
+    // these and not the general defintiions
     // Checks for "Primary Meaning" definitions
-    if ($('.def.selected').length !== 0) {
-      $('.definitions').find('.definitionNavigator').find('tr')
-        .each((i, el) => {
-          // Add the word Form to the sentence
-          const defLength = $(el).find('.posList').children().length;
-          for (let y = 0; y < defLength; y++) {
-            const defObj = {};
-            defObj.partOfSpeech = $(el).find('.posList').children()[y].children[0].data;
-            defObj.definition = $(el).find('.def')[y].children[0].data;
-            definitions.push(defObj);
-          }
-        });
-    } else {
-      $('.section.definition .sense').each((i, el) => {
-        const defObj = {};
-        // Add the word Form to the sentence
-        const originalString = $(el).find('h3.definition').text()
-          .replace(/\s\s+/g, ' ')
-          .trim();
-        defObj.partOfSpeech = originalString.split(' ')[0];
-        defObj.definition = originalString.split(' ').slice(1).join(' ');
-        definitions.push(defObj);
-      });
-    }
+    // if ($('.def.selected').length !== 0) {
+    //   $('.definitions').find('.definitionNavigator').find('tr')
+    //     .each((i, el) => {
+    //       // Add the word Form to the sentence
+    //       const defLength = $(el).find('.posList').children().length;
+    //       for (let y = 0; y < defLength; y++) {
+    //         const defObj = {};
+    //         defObj.partOfSpeech = $(el).find('.posList').children()[y].children[0].data;
+    //         defObj.definition = $(el).find('.def')[y].children[0].data;
+    //         definitions.push(defObj);
+    //       }
+    //     });
+    //   $('.defContent').each((i, el) => {
+    //     const instances = $(el).find('.instances').first();
+    //     const typeOfInstance = instances.find('dt').text().toLowerCase();
+    //     let synonyms = null;
+    //     if (typeOfInstance.indexOf('synonyms') !== -1) {
+    //       synonyms = instances.find('dd a')
+    //         .map((synIndex, element) => $(element).text())
+    //         .get();
+    //     }
+    //   });
+    //   console.log('asdkjfalksfjsdlkfjasflskaj');
+    // } else {
+    $('.section.definition .sense').each((i, el) => {
+      const defObj = {};
+      const instances = $(el).find('.defContent .instances').first();
+      const typeOfInstance = instances.find('dt').text().toLowerCase();
+      let synonyms = null;
+      if (typeOfInstance.indexOf('synonyms') !== -1) {
+        synonyms = instances.find('dd a')
+          .map((synIndex, element) => $(element).text())
+          .get();
+        console.log(synonyms);
+      }
+      // Add the word Form to the sentence
+      const originalString = $(el).find('h3.definition').text()
+        .replace(/\s\s+/g, ' ')
+        .trim();
+      defObj.synonyms = (synonyms) ? synonyms.slice(0) : [];
+      defObj.partOfSpeech = originalString.split(' ')[0];
+      defObj.definition = originalString.split(' ').slice(1).join(' ');
+      definitions.push(defObj);
+    });
+    // }
     wordObj.definitions = definitions;
     if (definitions.length > 0) {
       const $sections = $('.sectionHeader');
