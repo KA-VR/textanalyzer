@@ -1,6 +1,8 @@
 import async from 'async';
 import VocabFetcher from '../helpers/wordFetcher';
+// import VocabFetcher from 'vocab-fetcher';
 import redis from '../database/redis';
+
 
 const dictionary = new VocabFetcher();
 
@@ -18,6 +20,7 @@ const analyzeString = (text, filterWords, callback) => {
 
   async.eachSeries(filtered, (word, cb) => {
     getDefinition(word, definitions => {
+      // if (definitions) {
       for (let i = 0; i < definitions.length; i++) {
         const partOfSpeech = definitions[i].partOfSpeech;
         if (partOfSpeech === 'v' && !verb) {
@@ -28,6 +31,7 @@ const analyzeString = (text, filterWords, callback) => {
           i = definitions.length;
         }
       }
+      // }
       cb();
     });
   }, err => {
@@ -38,7 +42,7 @@ const analyzeString = (text, filterWords, callback) => {
 };
 
 const analyze = (req, res) => {
-  const text = req.body.text || '';
+  const text = req.body.text || 'failed';
   redis.retrieveFilteredWords(filterWords => {
     analyzeString(text, filterWords, data => {
       res.send(data);

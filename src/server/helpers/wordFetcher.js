@@ -67,12 +67,13 @@ function convertVocabDotComDomToJSON(body, callback) {
       });
     }
     wordObj.definitions = definitions;
-
-    const $sections = $('.sectionHeader');
-    const el = $sections[$sections.length - 2];
-    const family = $(el).next().attr('data');
-    const jsonFamily = JSON.parse(family);
-    wordObj.family = jsonFamily;
+    if (definitions.length > 0) {
+      const $sections = $('.sectionHeader');
+      const el = $sections[$sections.length - 2];
+      const family = $(el).next().attr('data');
+      const jsonFamily = JSON.parse(family);
+      wordObj.family = jsonFamily;
+    }
 
     callback(null, wordObj);
   } catch (e) {
