@@ -25,14 +25,16 @@ const analyzeString = (text, filterWords, callback) => {
       });
       for (let i = 0; i < definitions.length; i++) {
         const partOfSpeech = definitions[i].partOfSpeech;
+        const testObject = partOfSpeech === 'adj' || partOfSpeech === 'n' || /^[A-Z]/.test(word);
         if (partOfSpeech === 'v' && !verb) {
           verb = word;
           i = definitions.length;
-        } else if (partOfSpeech === 'adj' || partOfSpeech === 'n') {
+        } else if (testObject && verb) {
           object.push(word);
           i = definitions.length;
         }
       }
+      if (/^[A-Z]/.test(word)) object.push(word);
       cb();
     });
   }, err => {
