@@ -7,6 +7,10 @@ const data = [
   'the', 'to', 'a',
 ];
 
+const key = [
+  'image', 'picture', 'depiction',
+];
+
 const populateRedis = () => {
   async.each(data, word => {
     client.sadd(['residue', word], (err) => {
@@ -14,7 +18,15 @@ const populateRedis = () => {
       else console.log('Successful addition of word:', word);
     });
   }, err => {
-    console.log(err);
+    console.log('Error adding filter words', err);
+  });
+  async.each(key, word => {
+    client.sadd(['keywords', word], (err) => {
+      if (err) console.log('Error adding in ', word, ': ', err);
+      else console.log('Successful addition of word:', word);
+    });
+  }, err => {
+    console.log('Error adding keywords', err);
   });
   // data.forEach(word => {
   //   client.sadd(['residue', word], (err) => {
