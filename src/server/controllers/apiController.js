@@ -1,15 +1,30 @@
 import async from 'async';
-import VocabFetcher from '../helpers/wordFetcher';
 import redis from '../database/redis';
+import fetch from 'isomorphic-fetch';
 
+// const dictionary = new VocabFetcher();
+const dictionaryURL = 'http://localhost:8080/api/dict/';
+const thesaurusURL = 'http://localhost:8080/api/thes/';
 
-const dictionary = new VocabFetcher();
+const getDefinition = word =>
+  fetch(dictionaryURL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ word }),
+  }).then(definitions => definitions.json());
 
-const getDefinition = (word, cb) => {
-  dictionary.getWord(word)
-    .then(wordObj => wordObj.definitions)
-    .then(definitions => cb(definitions));
-};
+const getSynonyms = word =>
+  fetch(thesaurusURL, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ word }),
+  }).then(synonyms => synonyms.json());
 
 const analyzeString = (text, filters, callback) => {
   const words = text.split(' ');
@@ -19,30 +34,41 @@ const analyzeString = (text, filters, callback) => {
   const object = [];
   const keywords = [];
   let verb = null;
-  let synonyms = [];
+  let synonyms = null;
+
+  const assignSynonyms = syns => {
+    synonyms = syns.synonyms;
+  };
 
   async.eachSeries(filtered, (word, cb) => {
-    getDefinition(word, definitions => {
-      definitions.forEach(def => {
-        if (def.synonyms && def.partOfSpeech === 'v') synonyms = synonyms.concat(def.synonyms);
-      });
-      if (verb && filterKeywords.includes(word)) keywords.push(word);
-      else {
-        for (let i = 0; i < definitions.length; i++) {
-          const partOfSpeech = definitions[i].partOfSpeech;
-          const testObject = partOfSpeech === 'adj' || partOfSpeech === 'n' || /^[A-Z]/.test(word);
-          if (partOfSpeech === 'v' && !verb) {
-            verb = word;
-            i = definitions.length;
-          } else if (testObject && verb) {
-            object.push(word);
-            i = definitions.length;
-          }
+    getDefinition(word)
+      .then(definitions => {
+        if (verb && filterKeywords.includes(word)) {
+          keywords.push(word);
+          cb();
+        } else if (/^[A-Z]/.test(word)) {
+          object.push(word);
+          cb();
+        } else {
+          const findVerb = !verb;
+          definitions.forEach((definition, index) => {
+            const partOfSpeech = definition.partOfSpeech.replace(',', '');
+            const testObject = partOfSpeech === 'adjective' ||
+              partOfSpeech === 'noun' || /^[A-Z]/.test(word);
+            if (testObject && verb && !findVerb) {
+              object.push(word);
+              cb();
+            } else if (partOfSpeech === 'verb' && !verb) {
+              verb = word;
+              getSynonyms(word)
+                .then(assignSynonyms)
+                .then(() => { cb(); });
+            } else if (index === definitions.length - 1) {
+              cb();
+            }
+          });
         }
-        if (/^[A-Z]/.test(word)) object.push(word);
-      }
-      cb();
-    });
+      });
   }, err => {
     // eslint-disable-next-line no-console
     console.log(err);
@@ -59,12 +85,6 @@ const analyze = (req, res) => {
         res.send(data);
       });
     });
-  // redis.retrieveFilteredWords
-  //   .then(filterWords => {
-  //     analyzeString(text, filterWords, data => {
-  //       res.send(data);
-  //     });
-  //   });
 };
 
 export default { analyze, getDefinition };
