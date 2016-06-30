@@ -46,17 +46,22 @@ const analyzeString = (text, filters, callback) => {
         if (verb && filterKeywords.includes(word)) {
           keywords.push(word);
           cb();
+        } else if (definitions.length === 0 || verb === 'calculate') {
+          object.push(word);
+          cb();
         } else if (/^[A-Z]/.test(word)) {
           object.push(word);
           cb();
         } else {
           const findVerb = !verb;
+          let alreadyPushed = false;
           definitions.forEach((definition, index) => {
             const partOfSpeech = definition.partOfSpeech.replace(',', '');
             const testObject = partOfSpeech === 'adjective' ||
               partOfSpeech === 'noun' || /^[A-Z]/.test(word);
-            if (testObject && verb && !findVerb) {
+            if (testObject && verb && !findVerb && !alreadyPushed) {
               object.push(word);
+              alreadyPushed = true;
               cb();
             } else if (partOfSpeech === 'verb' && !verb) {
               verb = word;
