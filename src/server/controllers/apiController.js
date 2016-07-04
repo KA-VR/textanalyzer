@@ -46,8 +46,8 @@ const analyzeString = (text, filters, callback) => {
         if (verb && filterKeywords.includes(word)) {
           keywords.push(word);
           cb();
-        } else if (definitions.length === 0 || verb === 'calculate') {
-          object.push(word);
+        } else if (definitions.length === 0 || verb.toLowerCase() === 'calculate') {
+          object.push(word.toLowerCase());
           cb();
         } else if (/^[A-Z]/.test(word)) {
           object.push(word);
