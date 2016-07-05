@@ -43,8 +43,9 @@ const analyzeString = (text, filters, callback) => {
   async.eachSeries(filtered, (word, cb) => {
     getDefinition(word)
       .then(definitions => {
-        if (verb && (filterKeywords.includes(word) || filterKeywords.includes(word.toLowerCase()))) {
-          if (word === 'News') {
+        if (verb && filterKeywords.includes(word.toLowerCase())) {
+          const ascii = word.charCodeAt(0);
+          if (ascii >= 65 && ascii <= 90) {
             keywords.push(word.toLowerCase());
           } else {
             keywords.push(word);
