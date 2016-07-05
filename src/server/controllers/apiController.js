@@ -43,8 +43,12 @@ const analyzeString = (text, filters, callback) => {
   async.eachSeries(filtered, (word, cb) => {
     getDefinition(word)
       .then(definitions => {
-        if (verb && filterKeywords.includes(word)) {
-          keywords.push(word);
+        if (verb && (filterKeywords.includes(word) || filterKeywords.includes(word.toLowerCase()))) {
+          if (word === 'News') {
+            keywords.push(word.toLowerCase());
+          } else {
+            keywords.push(word);
+          }
           cb();
         } else if (definitions.length === 0 || verb && verb.toLowerCase() === 'calculate') {
           object.push(word.toLowerCase());
