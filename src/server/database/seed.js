@@ -8,7 +8,7 @@ const data = [
 ];
 
 const key = [
-  'image', 'picture', 'depiction', 'video', 'YouTube',
+  'image', 'picture', 'depiction', 'video', 'YouTube', 'news',
 ];
 
 const populateRedis = () => {
