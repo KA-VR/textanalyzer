@@ -4,11 +4,21 @@ import async from 'async';
 
 const client = redis.createClient();
 const data = [
-  'the', 'to', 'a',
+  'the', 'to', 'a', 'of',
 ];
 
 const key = [
-  'image', 'picture', 'depiction', 'video', 'YouTube', 'news',
+  'image',
+  'images',
+  'picture',
+  'pictures',
+  'depiction',
+  'depictions',
+  'video',
+  'videos',
+  'YouTube',
+  'news',
+  'weather',
 ];
 
 const populateRedis = () => {
