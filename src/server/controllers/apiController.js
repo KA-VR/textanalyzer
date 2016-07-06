@@ -5,26 +5,55 @@ import fetch from 'isomorphic-fetch';
 // const dictionary = new VocabFetcher();
 const dictionaryURL = 'http://localhost:8080/api/dict/';
 const thesaurusURL = 'http://localhost:8080/api/thes/';
+const writeURL = 'http://localhost:8080/api/writemongo';
+const searchURL = 'http://localhost:8080/api/searchmongo';
 
-const getDefinition = word =>
-  fetch(dictionaryURL, {
+const postReq = (url, data) => (
+  fetch(url, {
     method: 'POST',
     headers: {
-      Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ word }),
-  }).then(definitions => definitions.json());
+    body: JSON.stringify(data),
+  })
+);
+
+const getDefinition = word => (
+  postReq(dictionaryURL, { word })
+    .then(definitions => definitions.json())
+);
 
 const getSynonyms = word =>
-  fetch(thesaurusURL, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ word }),
-  }).then(synonyms => synonyms.json());
+  postReq(thesaurusURL, { word })
+    .then(synonyms => synonyms.json());
+
+const getFullDefinition = word => (
+  postReq(searchURL, { word })
+    .then(results => results.json())
+    .then(results => {
+      // Word exists in database
+      if (results.length !== 0) return results[0];
+      // Word doesn't exist. Fetch from api server.
+      if (results.length === 0) {
+        return postReq(dictionaryURL, { word })
+          .then(definitions => definitions.json())
+          .then(definitions => (
+            getSynonyms(word)
+              .then(synonyms => {
+                const fullDefinition = {
+                  name: word,
+                  def: definitions,
+                  syn: synonyms.synonyms,
+                  ant: synonyms.antonyms,
+                };
+                return postReq(writeURL, fullDefinition)
+                  .then(() => fullDefinition);
+              })
+          ));
+      }
+      return false;
+    })
+);
 
 const analyzeString = (text, filters, callback) => {
   const words = text.split(' ');
@@ -36,12 +65,8 @@ const analyzeString = (text, filters, callback) => {
   let verb = null;
   let synonyms = null;
 
-  const assignSynonyms = syns => {
-    synonyms = syns.synonyms;
-  };
-
   async.eachSeries(filtered, (word, cb) => {
-    getDefinition(word)
+    getFullDefinition(word)
       .then(definitions => {
         if (verb && filterKeywords.includes(word.toLowerCase())) {
           const ascii = word.charCodeAt(0);
@@ -51,7 +76,7 @@ const analyzeString = (text, filters, callback) => {
             keywords.push(word);
           }
           cb();
-        } else if (definitions.length === 0 || verb && verb.toLowerCase() === 'calculate') {
+        } else if (definitions.def.length === 0 || verb && verb.toLowerCase() === 'calculate') {
           object.push(word.toLowerCase());
           cb();
         } else if (/^[A-Z]/.test(word)) {
@@ -60,7 +85,7 @@ const analyzeString = (text, filters, callback) => {
         } else {
           const findVerb = !verb;
           let alreadyPushed = false;
-          definitions.forEach((definition, index) => {
+          definitions.def.forEach((definition, index) => {
             const partOfSpeech = definition.partOfSpeech.replace(',', '');
             const testObject = partOfSpeech === 'adjective' ||
               partOfSpeech === 'noun' || /^[A-Z]/.test(word);
@@ -70,10 +95,8 @@ const analyzeString = (text, filters, callback) => {
               cb();
             } else if (partOfSpeech === 'verb' && !verb) {
               verb = word;
-              getSynonyms(word)
-                .then(assignSynonyms)
-                .then(() => { cb(); });
-            } else if (index === definitions.length - 1) {
+              synonyms = definitions.syn;
+            } else if (index === definitions.def.length - 1) {
               cb();
             }
           });
