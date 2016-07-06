@@ -26,7 +26,6 @@ const key = [
   'direction',
   'directions',
   'Yelp',
-  'help',
 ];
 
 const populateRedis = () => {
