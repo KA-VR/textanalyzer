@@ -19,6 +19,12 @@ const key = [
   'YouTube',
   'news',
   'weather',
+  'map',
+  'maps',
+  'route',
+  'routes',
+  'direction',
+  'directions',
 ];
 
 const populateRedis = () => {
