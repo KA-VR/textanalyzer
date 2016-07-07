@@ -12,3 +12,6 @@ src/server/database/build
 
 # Ignore Node Modules
 node_modules
+
+# Ignore Dump
+dump.rdb
