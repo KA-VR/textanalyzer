@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 import redis from 'redis';
 import async from 'async';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_URL);
 const data = [
   'the', 'to', 'a', 'of',
 ];
