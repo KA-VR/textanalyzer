@@ -2,11 +2,11 @@ import async from 'async';
 import redis from '../database/redis';
 import fetch from 'isomorphic-fetch';
 
-// const dictionary = new VocabFetcher();
-const dictionaryURL = 'http://localhost:8080/api/dict/';
-const thesaurusURL = 'http://localhost:8080/api/thes/';
-const writeURL = 'http://localhost:8080/api/writemongo';
-const searchURL = 'http://localhost:8080/api/searchmongo';
+const apiURL = process.env.API_URL;
+const dictionaryURL = `${apiURL}/api/dict/`;
+const thesaurusURL = `${apiURL}/api/thes/`;
+const writeURL = `${apiURL}/api/writemongo`;
+const searchURL = `${apiURL}/api/searchmongo`;
 
 const postReq = (url, data) => (
   fetch(url, {
