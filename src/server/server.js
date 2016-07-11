@@ -16,5 +16,5 @@ app
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console
-  console.log(`Listen to dis shit on: ${port}`);
+  console.log(`Listening on: ${port}`);
 });

@@ -1,6 +1,8 @@
 import async from 'async';
 import redis from '../database/redis';
 import fetch from 'isomorphic-fetch';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const apiURL = process.env.API_URL;
 const dictionaryURL = `${apiURL}/api/dict/`;
@@ -66,6 +68,7 @@ const analyzeString = (text, filters, callback) => {
   let synonyms = null;
 
   async.eachSeries(filtered, (word, cb) => {
+    console.log(word);
     getFullDefinition(word)
       .then(definitions => {
         if (verb && filterKeywords.includes(word.toLowerCase())) {

@@ -8,7 +8,7 @@
     "postinstall": "babel src/server -d prod/server && node prod/server/database/seed.js",
     "watch-server": "babel --watch src/server -d dev/server",
     "start": "node prod/server/server.js",
-    "start:dev": "npm run watch-server & nodemon dev/server/server.js",
+    "dev": "npm run watch-server & nodemon dev/server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint * --quiet",
     "seed": "npm run dev-server:build && node dev/server/database/seed.js"
