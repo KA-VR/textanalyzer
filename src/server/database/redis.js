@@ -2,7 +2,8 @@
 import redis from 'redis';
 import Promise from 'bluebird';
 
-const client = Promise.promisifyAll(redis.createClient());
+const redisURL = process.env.REDIS_URL || null;
+const client = Promise.promisifyAll(redis.createClient(redisURL));
 
 client.on('error', (err) => {
   console.log('Error in database: ', err);

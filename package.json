@@ -5,8 +5,10 @@
   "main": "index.js",
   "scripts": {
     "dev-server:build": "babel src/server -d dev/server",
+    "postinstall": "babel src/server -d prod/server && node prod/server/database/seed.js",
     "watch-server": "babel --watch src/server -d dev/server",
-    "start": "npm run watch-server & nodemon dev/server/server.js",
+    "start": "node prod/server/server.js",
+    "dev": "npm run watch-server & nodemon dev/server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint * --quiet",
     "seed": "npm run dev-server:build && node dev/server/database/seed.js"
@@ -16,10 +18,13 @@
   "license": "ISC",
   "dependencies": {
     "async": "^2.0.0-rc.6",
+    "babel-cli": "^6.10.1",
+    "babel-preset-es2015": "^6.9.0",
     "bluebird": "^3.4.1",
     "body-parser": "^1.15.2",
     "cheerio": "^0.20.0",
     "cors": "^2.7.1",
+    "dotenv": "^2.0.0",
     "es6-promise": "^3.2.1",
     "express": "^4.14.0",
     "isomorphic-fetch": "^2.2.1",
@@ -28,8 +33,6 @@
     "request": "^2.72.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.10.1",
-    "babel-preset-es2015": "^6.9.0",
     "eslint": "^2.13.1",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.8.1",

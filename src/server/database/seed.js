@@ -1,8 +1,10 @@
 /* eslint-disable no-console */
 import redis from 'redis';
 import async from 'async';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_URL);
 const data = [
   'the', 'to', 'a', 'of',
 ];
@@ -29,21 +31,28 @@ const key = [
 ];
 
 const populateRedis = () => {
-  async.each(data, word => {
+  let count = 0;
+  async.each(data, (word, cb) => {
     client.sadd(['residue', word], (err) => {
       if (err) console.log('Error adding in ', word, ': ', err);
       else console.log('Successful addition of word:', word);
+      cb();
     });
   }, err => {
-    console.log('Error adding filter words', err);
+    count += 1;
+    if (count === 2) client.end(true);
+    if (err) console.log('Error adding filter words', err);
   });
-  async.each(key, word => {
+  async.each(key, (word, cb) => {
     client.sadd(['keywords', word], (err) => {
       if (err) console.log('Error adding in ', word, ': ', err);
       else console.log('Successful addition of word:', word);
+      cb();
     });
   }, err => {
-    console.log('Error adding keywords', err);
+    count += 1;
+    if (count === 2) client.end(true);
+    if (err) console.log('Error adding keywords', err);
   });
   // data.forEach(word => {
   //   client.sadd(['residue', word], (err) => {

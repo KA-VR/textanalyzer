@@ -1,12 +1,14 @@
 import async from 'async';
 import redis from '../database/redis';
 import fetch from 'isomorphic-fetch';
+import dotenv from 'dotenv';
+dotenv.config();
 
-// const dictionary = new VocabFetcher();
-const dictionaryURL = 'http://localhost:8080/api/dict/';
-const thesaurusURL = 'http://localhost:8080/api/thes/';
-const writeURL = 'http://localhost:8080/api/writemongo';
-const searchURL = 'http://localhost:8080/api/searchmongo';
+const apiURL = process.env.API_URL;
+const dictionaryURL = `${apiURL}/api/dict/`;
+const thesaurusURL = `${apiURL}/api/thes/`;
+const writeURL = `${apiURL}/api/writemongo`;
+const searchURL = `${apiURL}/api/searchmongo`;
 
 const postReq = (url, data) => (
   fetch(url, {
@@ -66,6 +68,7 @@ const analyzeString = (text, filters, callback) => {
   let synonyms = null;
 
   async.eachSeries(filtered, (word, cb) => {
+    console.log(word);
     getFullDefinition(word)
       .then(definitions => {
         if (verb && filterKeywords.includes(word.toLowerCase())) {
