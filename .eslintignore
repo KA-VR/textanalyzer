@@ -4,6 +4,9 @@ node_modules
 # Ignore Dev Folder
 dev
 
+# Ignore Prod Folder
+prod
+
 # Misc. Files
 .babelrc
 .eslintrc
@@ -13,3 +16,4 @@ npm-debug.log
 package.json
 .gitignore
 dump.rdb
+Dockerfile

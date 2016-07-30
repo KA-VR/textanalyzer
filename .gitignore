@@ -7,6 +7,9 @@ npm-debug.log
 # Ignore Dev Folder
 dev
 
+# Ignore Prod Folder
+prod
+
 # Ignore Build Folder
 src/server/database/build
 
